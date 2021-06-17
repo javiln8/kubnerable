@@ -1,0 +1,169 @@
+---
+version: 0.0.1
+description: "Vulnerability database"
+vulnerabilities:
+  - id: 1
+    title: "Containers running as root"
+    description: "Workload is running containers with the root user, which can lead to privilege escalation inside the host"
+    risk: "Medium"
+    cvss_score: 3.4
+    checks:
+      - description: "Workload does not specify a non-root user for its containers"
+        resource: "pod.SecurityContext"
+        compare:
+          - item: "runAsNonRoot"
+            operation: "=="
+            value: "nil"
+      - description: "Workload is running containers under root user and/or group"
+        resource: "container.SecurityContext"
+        compare:
+          - item: "runAsUser"
+            operation: "=="
+            value: 0
+          - item: "runAsGroup"
+            operation: "=="
+            value: 0
+    remediation: |
+      In your workload YAML definition, make sure to set one of the following settings:
+
+      - securityContext.runAsUser > 1000
+      - securityContext.runAsGroup > 1000
+      - securityContext.runAsNonRoot: true
+
+  - id: 2
+    title: "Privileged containers"
+    description: "Workload is running a process inside a privileged container, which can lead to unrestricted host access"
+    risk: "High"
+    cvss_score: 5.6
+    checks:
+      - description: "Workload is running privileged containers"
+        resource: "container.SecurityContext"
+        compare:
+          - item: "privileged"
+            operation: "=="
+            value: true
+    remediation: |
+      In your workload YAML definition, make sure to set one of the following settings:
+
+      - securityContext.runAsUser > 1000
+      - securityContext.runAsGroup > 1000
+      - securityContext.privileged: false
+
+  - id: 3
+    title: "Privilege escalation inside the container"
+    description: "Workload allows programs inside the container to run as root, even if the main process is not root"
+    risk: "Medium"
+    cvss_score: 2.3
+    checks:
+      - description: "Workload allows privilege escalation"
+        resource: "container.SecurityContext"
+        compare:
+          - item: "allowPrivilegeEscalation"
+            operation: "=="
+            value: true
+    remediation: |
+      In your workload YAML definition, make sure to set one of the following settings:
+
+      - securityContext.AllowPrivilegeEscalation: false
+      - securityContext.privileged: false
+
+  - id: 4
+    title: "Shared host network"
+    description: "Workload is exposed through a shared host network, which allows processes in the pod to communicate with processes bound to the host's loopback adapter"
+    risk: "Medium"
+    cvss_score: 4.2
+    checks:
+      - description: "Workload shares the host's network"
+        resource: "pod.Spec"
+        compare:
+          - item: "hostNetwork"
+            operation: "=="
+            value: true
+    remediation: |
+      In your workload YAML definition, make sure to set one of the following settings:
+
+      - spec.hostNetwork: false
+
+  - id: 5
+    title: "Containers shares the host PID"
+    description: "Workload shares the host's PID namespace, which allows visibility of node processes"
+    risk: "Medium"
+    cvss_score: 2.6
+    checks:
+      - description: "Workload shares the host's PID namespace"
+        resource: "pod.Spec"
+        compare:
+          - item: "hostPID"
+            operation: "=="
+            value: true
+    remediation: |
+      In your workload YAML definition, make sure to set one of the following settings:
+
+      - spec.hostPID: false
+
+  - id: 6
+    title: "Containers share the host IPC"
+    description: "Workload shares the host's IPC namespace, which allows container processes to communicate with processes on the node"
+    risk: "Medium"
+    cvss_score: 3.4
+    checks:
+      - description: "Workload shares the host's IPC namespace"
+        resource: "pod.Spec"
+        compare:
+          - item: "hostIPC"
+            operation: "=="
+            value: true
+    remediation: |
+      In your workload YAML definition, make sure to set one of the following settings:
+
+      - spec.hostIPC: false
+
+  - id: 7
+    title: "Containers with NET_RAW capability"
+    description: "Workload is running containers with NET_RAW capability, which enables the container to craft any packet, including malformed or malicious packets."
+    risk: "Medium"
+    cvss_score: 3.1
+    checks:
+      - description: "Container with NET_RAW capability"
+        resource: "container.SecurityContext"
+        compare:
+          - item: "capabilities"
+            operation: "add"
+            value: NET_RAW
+          - item: "capabilities"
+            operation: "add"
+            value: NET_ADMIN
+    remediation: |
+      In your workload YAML definition, make sure to set one of the following settings:
+
+      - securityContext.capabilities.drop: -NET_RAW
+
+  - id: 8
+    title: "Workload mounts a writable volume"
+    description: "Workload is mounting a writable volume with an OS directory, which grants access to critical host configuration and binaries"
+    risk: "High"
+    cvss_score: 5.4
+    checks:
+      - description: "Workload mounts the whole host file-system"
+        resource: "pod.Spec"
+        compare:
+          - item: "volumes"
+            operation: "path"
+            value: "/"
+      - description: "Workload mounts the host docker.sock, which enables communication with the Docker API"
+        resource: "pod.Spec"
+        compare:
+          - item: "volumes"
+            operation: "path"
+            value: "/var/run"
+          - item: "volumes"
+            operation: "path"
+            value: "/var"
+          - item: "volumes"
+            operation: "path"
+            value: "/var/run/docker.sock"
+    remediation: |
+      In your workload YAML definition, make sure to set one of the following settings:
+
+      - containers.volumeMounts.readOnly: true
+      - containers.securityContext.readOnlyRootFilesystem: true
