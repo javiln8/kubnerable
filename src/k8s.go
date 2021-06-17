@@ -2,20 +2,16 @@ package main
 
 import (
 	"context"
+	"os"
+	"path/filepath"
+	
 	"k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
-	"os"
-	"path/filepath"
 )
 
-type PodInfo struct {
-	PodName    string
-	Containers []string
-	Namespace  string
-}
 
 // GetClient returns a new client session with the Kubernetes cluster
 func GetClient(kubeConfig *rest.Config) *kubernetes.Clientset {
