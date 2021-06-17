@@ -1,4 +1,10 @@
-# kubnerable
+<h1 align="center">
+  Kubnerable 
+</h1>
+
+<a href="https://goreportcard.com/report/github.com/javiln8/kubnerable"><img src="https://goreportcard.com/badge/github.com/javiln8/kubnerable"></a>
+
+
 Kubnerable is an out-cluster vulnerability scanner tool for Kubernetes resources. It comes with a predefined vulnerability 
 database (`vulnerabilities.yaml`) with basic pod weaknesses checks.
 
