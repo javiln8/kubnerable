@@ -5,6 +5,8 @@ database (`vulnerabilities.yaml`) with basic pod weaknesses checks.
 For testing purposes, there is a Kind setup for bootstrapping a cluster with vulnerable predefined scenarios. For more info,
 check the following [README](kubnerable_cluster/README.md).
 
+*This project was done as part of my Master's Thesis and as an excuse to learn Go from scratch 🐹*
+
 ## Features
 ![Kubnerable Execution](images/execution_example.png)
 * Out-cluster resource vulnerabilities scanning
