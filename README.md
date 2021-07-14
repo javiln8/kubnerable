@@ -36,3 +36,13 @@ Flags:
   -h, --help               help for kubnerable
   -f, --vuls-file string   Vulnerabilities YAML file path, needed for scanning (default "../vulnerabilities.yaml")
 ```
+
+## TODOs
+- [ ] Resource denial of services and the associated scenario
+- [ ] Network exposure and the associted scenario
+- [ ] RBAC analysis
+
+## Inspirations
+Kubnerable is inspired by today's state-of-the-art Kubernetes vulnerability scanners:
+* Kubernetes vulnerability mapping inspired by Octarine's [KCCSS](https://github.com/octarinesec/kccss)
+* YAML Vulnerability Database inspired by Aqua Security's [Kube-Bench](https://github.com/aquasecurity/kube-bench)
